@@ -48,7 +48,7 @@
 //#define FREQUENCY     RF69_433MHZ //Match this with the version of your Moteino! (others: RF69_433MHZ, RF69_868MHZ)
 #define FREQUENCY     RF69_915MHZ //Match this with the version of your Moteino! (others: RF69_433MHZ, RF69_868MHZ)
 //#define FREQUENCY_EXACT 917000000 //uncomment and set to a specific frequency in Hz, if commented the center frequency is used
-#define ENCRYPTKEY    "SaffellBot123456" //has to be same 16 characters/bytes on all nodes, not more not less!
+#define ENCRYPTKEY    "16CHARACTERS1234" //has to be same 16 characters/bytes on all nodes, not more not less!
 #define IS_RFM69HW    //uncomment only for RFM69HW! Leave out if you have RFM69W!
 #define ENABLE_ATC    //comment out this line to disable AUTO TRANSMISSION CONTROL //more here: http://lowpowerlab.com/blog/2015/11/11/rfm69_atc-automatic-transmission-control/
 //#define ENABLE_WIRELESS_PROGRAMMING    //comment out this line to disable Wireless Programming of this gateway node
