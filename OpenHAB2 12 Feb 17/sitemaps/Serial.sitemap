@@ -1,0 +1,26 @@
+sitemap default label="Main Menu"
+{
+	Frame
+	{
+		Text item=Serial
+		Switch item=Security icon="light"
+	}
+	
+	Frame
+	{
+		Chart item=g_Temperature period=D refresh=600000
+		Chart item=g_Humidity period=D refresh=600000
+		Chart item=g_Light period=D refresh=600000
+	}
+	
+   	Frame
+   	{     
+   		Group item=g_Diagnosis label="Diagnosis" icon="blank"
+   		Group item=g_Security label="Security" icon="blank"
+   	}
+   	
+   	Frame
+   	{
+   		Chart item=g_Battery  period=M refresh=600000
+   	}
+}

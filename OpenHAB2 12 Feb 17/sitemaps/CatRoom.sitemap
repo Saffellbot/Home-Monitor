@@ -1,0 +1,11 @@
+sitemap CatFeeder label="Cat Feeder Controls"
+{
+Frame   
+		{
+		Setpoint item=FeedDuration label="Feed Duration" icon="blank" minValue=0 maxValue=4294967295 step=100
+		Text item=FeedDuration
+		Setpoint item=FeedPeriod label="Feed Period" icon="blank" minValue=0 maxValue=71582 step=1
+		Text item=FeedPeriod
+		Switch item=KittyFix label="Initialize Feeder Values" icon="blank"
+		}	
+}

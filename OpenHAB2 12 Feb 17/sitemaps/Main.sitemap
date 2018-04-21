@@ -1,0 +1,10 @@
+sitemap Main label="8541 Cedar Ln"
+{
+Frame   
+		{
+		Group item=g_F0 label="Main Floor" icon="groundfloor"
+		Group item=g_B1 label="Basement" icon="cellar"
+		Group item=g_Diagnosis label="Diagnosis" icon="diagnosis"
+		Group item=g_Security label="Security" icon="security"
+		}		
+}

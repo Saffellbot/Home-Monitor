@@ -1,0 +1,797 @@
+import org.joda.time.*
+import org.openhab.core.types.*
+import org.openhab.core.library.types.*
+import org.openhab.core.library.items.*
+import org.openhab.core.items.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import org.eclipse.xtext.xbase.lib.*
+import org.eclipse.xtext.xbase.lib.*
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.math.BigDecimal.*
+import java.lang.Integer
+import java.lang.Double
+import java.lang.String
+import java.lang.Number
+import java.lang.Math
+import org.openhab.model.script.actions.Timer
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
+
+
+var int temperatureAlarm=0
+//var Timer temperatureAlarmTimer timer=null
+//var Timer battery4AlarmTimer timer=null
+//var Timer battery5AlarmTimer timer=null
+var int watchdog2=0
+var int watchdog3=0
+var int watchdog4=0
+var int watchdog5=0
+var int watchdog6=0
+var int watchdog7=0
+var int watchdog2Status=0
+var int watchdog3Status=0
+var int watchdog4Status=0
+var int watchdog5Status=0
+var int watchdog6Status=0
+var int watchdog7Status=0
+var int battery4Low=0
+var int securityUpdated=0
+
+var int securityCounter=0
+
+rule "Serial"
+
+when
+	Item Serial received update
+then
+	
+	var String serialBuffer = Serial.state.toString.trim
+	
+	logInfo("\r\nserialBuffer:", serialBuffer + " ");
+	
+	if (!serialBuffer.contains("$"))
+	{
+		serialBuffer=""
+	}
+	
+	var String serialData
+	
+	var int serialLength = serialBuffer.length
+
+	var int terminationLocation = serialBuffer.indexOf("*")
+
+	serialData = serialBuffer.substring(0, terminationLocation+1)
+	//logInfo("serialData:", serialData+" ");
+	
+	if (serialLength>terminationLocation+1)
+	{
+	serialBuffer = serialBuffer.substring(terminationLocation+1, serialLength)
+	//logInfo("serialBuffer:", serialBuffer + " ");
+	}
+	else
+	{
+	serialBuffer=""
+	}
+	
+	while (serialData.contains("$"))
+	{	
+
+	if (serialData.contains("$2@"))
+	{
+		watchdog2=0
+		if (watchdog2Status==1)
+		{
+			sendBroadcastNotification("Node 2 Online")
+		}
+		watchdog2Status=0
+		
+		if (serialData.contains("@Li#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N2_Light, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@Te#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N2_Temperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@Hu#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N2_Humidity, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@RT#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N2_EnclosureTemperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@SS#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N2_RadioSignal, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@TL#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N2_TransmitLevel, value);
+			serialData = ""
+		}
+		serialData = ""
+		
+	}
+	
+	if (serialData.contains("$3@"))
+	{
+		watchdog3=0
+		if (watchdog3Status==1)
+		{
+			sendBroadcastNotification("Node 3 Online")
+		}
+		watchdog3Status=0
+		
+		if (serialData.contains("@Li#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N3_Light, (value*1.5));
+			serialData = ""
+		}
+		
+		if (serialData.contains("@Te#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N3_Temperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@Hu#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N3_Humidity, value);
+			serialData = ""
+		}
+				
+		if (serialData.contains("@RT#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N3_EnclosureTemperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@SS#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N3_RadioSignal, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@TL#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N3_TransmitLevel, value);
+			serialData = ""
+		}
+		serialData = ""
+	}
+	
+	if (serialData.contains("$4@"))
+	{
+		watchdog4=0
+		if (watchdog4Status==1)
+		{
+			sendBroadcastNotification("Node 4 Online")
+		}
+		watchdog4Status=0
+		
+		if (serialData.contains("@LI#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N4_Light, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@TE#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N4_Temperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@BV#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N4_Battery, value);
+			serialData = ""
+		}
+				
+		if (serialData.contains("@RT#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N4_EnclosureTemperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@SS#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N4_RadioSignal, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@TL#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N4_TransmitLevel, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@DC#"))
+		{
+			postUpdate(BackDoor, CLOSED);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@DO#"))
+		{
+			postUpdate(BackDoor, OPEN);
+			serialData = ""
+		}
+		
+	}
+		
+	if (serialData.contains("$5@"))
+	{
+		watchdog5=0
+		if (watchdog5Status==1)
+		{
+			sendBroadcastNotification("Node 5 Online")
+		}
+		watchdog5Status=0
+		
+		if (serialData.contains("@LI#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N5_Light, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@TE#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N5_Temperature, value);
+			serialData = ""
+		}
+		
+		/*if (serialData.contains("@BV#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N5_Battery, value);
+			serialData = ""
+		}
+		*/
+				
+		if (serialData.contains("@RT#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N5_EnclosureTemperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@SS#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N5_RadioSignal, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@TL#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N5_TransmitLevel, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@DC#"))
+		{
+			postUpdate(FrontDoor, CLOSED);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@DO#"))
+		{
+			postUpdate(FrontDoor, OPEN);
+			serialData = ""
+		}
+	
+		if (serialData.contains("@GS#"))
+		{
+			securityUpdated=0;
+			serialData = ""
+		}
+		
+		if (serialData.contains("@SE#"))
+		{
+			if (Security.state == OFF)
+			{
+				sendCommand(Security, ON)
+			}
+			securityUpdated=0;
+			serialData = ""
+		}
+		
+		if (serialData.contains("@SD#"))
+		{
+			if (Security.state == ON)
+			{
+				sendCommand(Security, OFF)
+			}
+			securityUpdated=0;
+			serialData = ""
+		}
+		
+		serialData = ""
+	}
+
+	if (serialData.contains("$6@"))
+	{
+		watchdog6=0
+		if (watchdog6Status==1)
+		{
+			sendBroadcastNotification("Node 6 Online")
+		}
+		watchdog6Status=0
+		
+		if (serialData.contains("@RT#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N6_EnclosureTemperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@SS#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N6_RadioSignal, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@TL#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N6_TransmitLevel, value);
+			serialData = ""
+		}
+		serialData = ""
+	}
+	
+	if (serialData.contains("$7@"))
+	{
+		watchdog7=0
+		if (watchdog7Status==1)
+		{
+			sendBroadcastNotification("Node 7 Online")
+		}
+		watchdog7Status=0
+		
+		if (serialData.contains("@LI#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N7_Light, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@TE#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N7_Temperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@RT#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N7_EnclosureTemperature, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@SS#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N7_RadioSignal, value);
+			serialData = ""
+		}
+		
+		if (serialData.contains("@TL#"))
+		{
+			var int valueStartsAt = serialData.indexOf("#")
+			var int valueEndsAt = serialData.indexOf("*")
+			var String valueAsString = serialData.substring((valueStartsAt+1), (valueEndsAt))
+			var float value = 0.0f
+			value = Float::parseFloat(valueAsString)
+			postUpdate(N7_TransmitLevel, value);
+			serialData = ""
+		}
+		
+		serialData = ""
+	}
+
+
+/////Begin Serial Handling for concentated(?) string///
+
+
+	serialLength = serialBuffer.length
+	if (serialLength>2)
+	{
+		terminationLocation = serialBuffer.indexOf("*")
+		serialData=serialBuffer.substring(0,terminationLocation+1)
+		if ((serialLength-terminationLocation)>2)
+		{
+			serialBuffer=serialBuffer.substring(terminationLocation+1, serialLength)
+		}
+		else
+		{
+			serialBuffer=""
+		}
+	}
+	else
+	{
+		serialData=""
+		serialBuffer=""
+	}
+	
+	}
+	
+	serialData=""
+	serialBuffer=""
+	
+end
+
+rule "House Too Hot"
+
+when
+	Item Temperature received update
+then
+	if (temperatureAlarm==0)
+	{
+		if (Temperature.members.filter(s | s.state > 80).size > 0)
+		{
+			temperatureAlarm=1
+			sendBroadcastNotification("High Temperature")
+			temperatureAlarmTimer = createTimer(now.plusSeconds(3600))
+			[|
+	    		temperatureAlarm=0
+    	    ]
+    	}
+    	if (Temperature.members.filter(s | s.state < 55).size > 0)
+		{
+			temperatureAlarm=1
+			sendBroadcastNotification("Low Temperature")
+			temperatureAlarmTimer = createTimer(now.plusSeconds(3600))
+			[|
+	    		temperatureAlarm=0
+    	    ]
+    	}
+    }       
+end
+
+rule "Watchdog"
+
+when
+	Time cron "0/10 * * * * ?"
+then
+	
+	watchdog2=watchdog2+1
+	watchdog3=watchdog3+1
+	watchdog4=watchdog4+1
+	watchdog5=watchdog5+1
+	watchdog6=watchdog6+1
+	watchdog7=watchdog7+1
+	postUpdate(N2_WatchdogTimer, watchdog2);
+	postUpdate(N3_WatchdogTimer, watchdog3);
+	postUpdate(N4_WatchdogTimer, watchdog4);
+	postUpdate(N5_WatchdogTimer, watchdog5);
+	postUpdate(N6_WatchdogTimer, watchdog6);
+	postUpdate(N7_WatchdogTimer, watchdog7);
+	if (watchdog2>40 && watchdog2Status==0)
+	{
+		sendBroadcastNotification("Node 2 Offline")
+		watchdog2Status=1
+	}
+	if (watchdog3>40 && watchdog3Status==0)
+	{
+		sendBroadcastNotification("Node 3 Offline")
+		watchdog3Status=1
+	}
+	if (watchdog4>60 && watchdog4Status==0)
+	{
+		sendBroadcastNotification("Node 4 Offline")
+		watchdog4Status=1
+	}
+	if (watchdog5>60 && watchdog5Status==0)
+	{
+		sendBroadcastNotification("Node 5 Offline")
+		watchdog5Status=1
+	}
+	if (watchdog6>600 && watchdog6Status==0)
+	{
+		sendBroadcastNotification("Node 6 Offline")
+		watchdog6Status=1
+	}
+	if (watchdog7>60 && watchdog7Status==0)
+	{
+		sendBroadcastNotification("Node 7 Offline")
+		watchdog7Status=1
+	}
+end
+
+rule "Node 4 Battery Monitor"
+
+when 
+	Item N4_Battery changed
+then
+	if (N4_Battery.state < 2.4 && battery4Low==0)
+	{
+		battery4Low=1
+		sendBroadcastNotification("Node 4 batteries are low")
+		battery4AlarmTimer = createTimer(now.plusSeconds(86400))
+			[|
+	    		battery4Low=0
+    	    ]
+	}
+	if (N4_Battery.state > 2.7 && battery4Low==1)
+	{
+		battery4Low=0
+	}
+end
+
+rule "Security Monitor Update"
+
+when
+	Item Security changed
+then
+	if (Security.state == OFF)
+	{
+		sendCommand(Serial, "^5@SC0*")
+	}
+	if (Security.state == ON)
+	{
+		sendCommand(Serial, "^5@SC1*")
+	}
+end
+
+rule "Secured Monitor Status Get"
+
+when
+	Time cron "*/5 * * * * ?"
+then
+	if(securityUpdated==0)
+	{
+		if (Security.state == OFF)
+		{
+			sendCommand(Serial, "^5@SC0*")
+		}
+		if (Security.state == ON)
+		{
+			sendCommand(Serial, "^5@SC1*")
+		}
+		securityUpdated=1
+	}
+end
+
+rule "Update security monitors"
+
+when 
+	Time cron "0 */10 * * * ?"
+then
+	if (Security.state == OFF)
+	{
+		sendCommand(Serial, "^5@SC0*")
+	}
+	if (Security.state == ON)
+	{
+		sendCommand(Serial, "^5@SC1*")
+	}
+end
+
+
+rule "Door Alarm"
+
+when 
+	Time cron "*/30 * * * * ?"
+then
+	if (Security.state == ON)
+	{
+		if (FrontDoor.state == OPEN || BackDoor.state == OPEN)
+		{
+			if (securityCounter==1)
+			{
+				sendCommand(Serial, "^6@AL*")
+				sendBroadcastNotification("Door Open")
+			}
+			if (securityCounter==0)
+			{
+				securityCounter=1
+			}	
+		}
+		else
+		{
+			securityCounter=0
+		}
+	}
+	
+	if (Security.state == OFF)
+	{
+		securityCounter=0
+	}	
+end
+
+//CAT FEEDER SECTION///////////////////////////
+
+rule "Grotesque Kitty Fix"
+
+when
+	Item KittyFix changed
+then
+	postUpdate(FeedDuration, 500)
+	postUpdate(FeedPeriod, 300)
+end	
+
+rule "Send Kitty Feed Duration Setpoint"
+
+when
+	Time cron "2 2 * * * ?"
+then
+	var String message
+	message="^7@FD#"+FeedDuration.state.toString+"*"
+	sendCommand(Serial, message)
+end
+
+rule "Send Kitty Feed Period Setpoint"
+
+when
+	Time cron "1 1 * * * ?"
+then
+	var String message
+	var String FeedPeriodString
+	var int FeedPeriodInt = (FeedPeriod.state as DecimalType).intValue
+	FeedPeriodInt=FeedPeriodInt*60000
+	FeedPeriodString=Integer.toString(FeedPeriodInt)
+	message="^7@FP#"+FeedPeriodString+"*"
+	sendCommand(Serial, message)
+end

@@ -1,0 +1,88 @@
+Group g_All
+
+Group g_Debug (g_All)
+Group g_F0 (g_All)
+Group g_B1 (g_All)
+Group g_Diagnosis "Diagnosis" <diagnosis> (g_All)
+
+Group g_Security "Security" <security> (g_All)
+Switch Security "Security System" <security> (g_Security)
+
+String Serial "Serial [%s]" <serial> (g_Diagnosis) {serial="/dev/ttyAMA0@19200"} 
+
+Group g_F0_Kitchen "Kitchen" <kitchen> (g_F0)
+
+Number N2_Light "Kitchen Illumination [%.1f Lux]" <lux> (g_F0_Kitchen, g_Light, g_F0Light)
+Number N2_Temperature "Kitchen Temperature [%.1f F]" <temp> (g_F0_Kitchen, g_Temperature, g_F0Temperature)
+Number N2_Humidity "Kitchen Humidity [%.1f %%]" <humidity> (g_F0_Kitchen, g_Humidity, g_F0Humidity)
+
+Group g_F0_BackDoor "Back Door" <backdoor> (g_F0)
+
+Number N4_Light "Back Door Illumination [%.1f Lux]" <lux> (g_F0_BackDoor, g_Light, g_F0Light)
+Number N4_Temperature "Back Door Temperature [%.1f F]" <temp> (g_F0_BackDoor, g_Temperature, g_F0Temperature)
+Contact BackDoor "Back Door Position [%s]" <contact> (g_Security, g_F0_BackDoor)
+
+Group g_F0_FrontDoor "Front Door" <backdoor> (g_F0)
+
+Number N5_Light "Front Door Illumination [%.1f Lux]" <lux> (g_F0_FrontDoor, g_Light, g_F0Light)
+Number N5_Temperature "Front Door Temperature [%.1f F]" <temp> (g_F0_FrontDoor, g_Temperature, g_F0Temperature)
+Contact FrontDoor "Front Door Position [%s]" <contact> (g_Security, g_F0_FrontDoor)
+
+Group g_F0_KittyRoom "Kitty Room" (g_F0)
+
+Number FeedDuration "Feeder Run Duration [%.0f mS]" (g_F0_KittyRoom)
+Number FeedPeriod "Feeder Run Period [%.0f min]" (g_F0_KittyRoom)
+Switch KittyFix "Initialize Feeder Values" (g_F0_KittyRoom)
+Number N7_Light "Cat Room Illumination [%.1f Lux]" <lux> (g_F0_KittyRoom, g_Light, g_F0Light)
+Number N7_Temperature "Cat Room Temperature [%.1f F]" <temp> (g_F0_KittyRoom, g_Temperature, g_F0Temperature)
+
+Group g_B1_Computer "PC Room" <pc> (g_B1)
+
+Number N3_Light "PC Room Illumination [%.1f Lux]" <lux> (g_B1_Computer, g_Light, g_B1Light)
+Number N3_Temperature "PC Room Temperature [%.1f F]" <temp> (g_B1_Computer, g_Temperature, g_B1Temperature)
+Number N3_Humidity "PC Room Humidity [%.1f %%]" <humidity> (g_B1_Computer, g_Humidity, g_B1Humidity)
+
+Group g_Radio "Radio Data" <radio> (g_Diagnosis)
+Group g_Battery "Battery Levels" (g_Radio)
+
+Number N2_EnclosureTemperature "#2 Enclosure Temperature [%.0f F]" <temp> (g_Radio)
+Number N2_RadioSignal "#2 Radio RSSI [%.0f dB]" <radio> (g_Radio)
+Number N2_TransmitLevel "#2 Radio Transmit Level [%.0f]" <radio> (g_Radio)
+Number N2_WatchdogTimer "#2 Watchdog Timer [%.0f]" <timer> (g_Radio)
+Number N3_EnclosureTemperature "#3 Enclosure Temperature [%.0f F]" <temp> (g_Radio)
+Number N3_RadioSignal "#3 Radio RSSI [%.0f dB]" <radio> (g_Radio)
+Number N3_TransmitLevel "#3 Radio Transmit Level [%.0f]" <radio> (g_Radio)
+Number N3_WatchdogTimer "#3 Watchdog Timer [%.0f]" <timer> (g_Radio)
+Number N4_EnclosureTemperature "#4 Enclosure Temperature [%.0f F]" <temp> (g_Radio)
+Number N4_RadioSignal "#4 Radio RSSI [%.0f dB]" <radio> (g_Radio)
+Number N4_TransmitLevel "#4 Radio Transmit Level [%.0f]" <radio> (g_Radio)
+Number N4_WatchdogTimer "#4 Watchdog Timer [%.0f]" <timer> (g_Radio)
+Number N4_Battery "#4 Battery level [%.3f Volts]" <battery> (g_Radio, g_Battery)
+Number N5_EnclosureTemperature "#5 Enclosure Temperature [%.0f F]" <temp> (g_Radio)
+Number N5_RadioSignal "#5 Radio RSSI [%.0f dB]" <radio> (g_Radio)
+Number N5_TransmitLevel "#5 Radio Transmit Level [%.0f]" <radio> (g_Radio)
+Number N5_WatchdogTimer "#5 Watchdog Timer [%.0f]" <timer> (g_Radio)
+Number N6_EnclosureTemperature "#6 Enclosure Temperature [%.0f F]" <temp> (g_Radio)
+Number N6_RadioSignal "#6 Radio RSSI [%.0f dB]" <radio> (g_Radio)
+Number N6_TransmitLevel "#6 Radio Transmit Level [%.0f]" <radio> (g_Radio)
+Number N6_WatchdogTimer "#6 Watchdog Timer [%.0f]" <timer> (g_Radio)
+Number N7_EnclosureTemperature "#7 Enclosure Temperature [%.0f F]" <temp> (g_Radio)
+Number N7_RadioSignal "#7 Radio RSSI [%.0f dB]" <radio> (g_Radio)
+Number N7_TransmitLevel "#7 Radio Transmit Level [%.0f]" <radio> (g_Radio)
+Number N7_WatchdogTimer "#7 Watchdog Timer [%.0f]" <timer> (g_Radio)
+
+Group g_Temperature "Temperature" <temp> (g_Diagnosis)
+Group g_Humidity "Humidity" <humidity> (g_Diagnosis)
+Group g_Light "Light" <lux> (g_Diagnosis)
+
+Group:Number:AVG  g_F0Temperature "Main Floor Temperature. AVE: [%.2f F]" <temp> (g_Temperature, g_HouseTemperature)
+Group:Number:AVG  g_F0Light "Main Floor Illumination AVE: [%.2f Lux]" <lux> (g_Light, g_HouseLight)
+Group:Number:AVG  g_F0Humidity "Main Floor Humidity AVE: [%.2f %]" <humidity> (g_Humidity, g_HouseHumidity)
+
+Group:Number:AVG  g_B1Temperature "Basement Temperature. AVE: [%.2f F]" <temp> (g_Temperature, g_HouseTemperature)
+Group:Number:AVG  g_B1Light "Basement Light. AVE: [%.2f Lux]" <lux> (g_Light, g_HouseLight)
+Group:Number:AVG  g_B1Humidity "Basement Humidity. AVE: [%.2f %]" <humidity> (g_Humidity, g_HouseHumidity)
+
+Group:Number:AVG  g_HouseTemperature "House Temperature. AVE: [%.2f F]" <temp> (g_Temperature)
+Group:Number:AVG  g_HouseHumidity "House Humidity. AVE: [%.2f %]" <humidity> (g_Humidity)
+Group:Number:AVG  g_HouseLight "House Illumination. AVE: [%.2f Lux]" <lux> (g_Light)
